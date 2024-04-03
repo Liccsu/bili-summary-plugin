@@ -19,12 +19,12 @@ export class Wbi {
     return Wbi.mixinKeyEncTab.map(n => orig[n]).join('').slice(0, 32)
   }
 
-  encWbi (params, img_key, sub_key) {
-    const mixin_key = Wbi.getMixinKey(img_key + sub_key),
-      curr_time = Math.round(Date.now() / 1000),
-      chr_filter = /[!'()*]/g
+  encWbi (params, imgKey, subKey) {
+    const mixinKey = Wbi.getMixinKey(imgKey + subKey)
+    const currTime = Math.round(Date.now() / 1000)
+    const chrFilter = /[!'()*]/g
 
-    Object.assign(params, { wts: curr_time }) // 添加 wts 字段
+    Object.assign(params, { wts: currTime }) // 添加 wts 字段
     // 按照 key 重排参数
     const query = Object
       .keys(params)
@@ -32,14 +32,14 @@ export class Wbi {
       .filter(key => !!params[key])
       .map(key => {
         // 过滤 value 中的 "!'()*" 字符
-        const value = params[key].toString().replace(chr_filter, '')
+        const value = params[key].toString().replace(chrFilter, '')
         return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
       })
       .join('&')
 
-    const wbi_sign = md5(query + mixin_key) // 计算 w_rid
+    const wbiSign = md5(query + mixinKey) // 计算 w_rid
 
-    return query + '&w_rid=' + wbi_sign
+    return query + '&w_rid=' + wbiSign
   }
 
   async getWbiKeys () {
@@ -52,28 +52,34 @@ export class Wbi {
     const {
       data: {
         wbi_img: {
-          img_url,
-          sub_url
+          img_url: imgUrl,
+          sub_url: subUrl
         }
       }
     } = await res.json()
 
     return {
-      img_key: img_url.slice(
-        img_url.lastIndexOf('/') + 1,
-        img_url.lastIndexOf('.')
+      // eslint-disable-next-line camelcase
+      imgKey: imgUrl.slice(
+        // eslint-disable-next-line camelcase
+        imgUrl.lastIndexOf('/') + 1,
+        // eslint-disable-next-line camelcase
+        imgUrl.lastIndexOf('.')
       ),
-      sub_key: sub_url.slice(
-        sub_url.lastIndexOf('/') + 1,
-        sub_url.lastIndexOf('.')
+      // eslint-disable-next-line camelcase
+      subKey: subUrl.slice(
+        // eslint-disable-next-line camelcase
+        subUrl.lastIndexOf('/') + 1,
+        // eslint-disable-next-line camelcase
+        subUrl.lastIndexOf('.')
       )
     }
   }
 
   async getQuery () {
     const {
-      img_key,
-      sub_key
+      imgKey,
+      subKey
     } = await this.getWbiKeys()
     const params = {
       aid: this.aid,
@@ -81,6 +87,6 @@ export class Wbi {
       cid: this.cid,
       up_mid: this.up_mid
     }
-    return this.encWbi(params, img_key, sub_key)
+    return this.encWbi(params, imgKey, subKey)
   }
 }

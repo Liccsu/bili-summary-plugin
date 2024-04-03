@@ -1,5 +1,4 @@
 import fs from 'node:fs'
-import chalk from 'chalk'
 
 if (!global.segment) {
   try {
@@ -9,11 +8,12 @@ if (!global.segment) {
   }
 }
 
-logger.info(chalk.rgb(255, 255, 0)(`Bili-Summary-plugin is loading.`))
-logger.info(chalk.rgb(255, 255, 0)(`================================================`))
-logger.info(chalk.rgb(255, 255, 0)(`Welcome to use the Bili-Summary-plugin.`))
-logger.info(chalk.rgb(255, 255, 0)(`https://gitee.com/Liccsu/BiliBili-Summary-plugin`))
-logger.info(chalk.rgb(255, 255, 0)(`================================================`))
+logger.info(logger.magenta('= ================================================ ='))
+logger.info(logger.yellow('= Bili-Summary-plugin is loading. ='))
+logger.info(logger.magenta('= ================================================ ='))
+logger.info(logger.yellow('= Welcome to use the Bili-Summary-plugin. ='))
+logger.info(logger.yellow('= https://gitee.com/Liccsu/BiliBili-Summary-plugin ='))
+logger.info(logger.magenta('= ================================================ ='))
 
 const files = fs
   .readdirSync('./plugins/bili-summary-plugin/apps')

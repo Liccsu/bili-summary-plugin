@@ -19,7 +19,7 @@ export class Networks {
       headers: this.headers,
       method: this.method.toUpperCase(),
       agent: this.agent,
-      redirect: this.redirect, // 使用构造函数中的redirect设置
+      redirect: this.redirect // 使用构造函数中的redirect设置
     }
     if (this.body && this.method.toLowerCase() === 'post') {
       config.body = JSON.stringify(this.body)
@@ -57,6 +57,7 @@ export class Networks {
       clearTimeout(id)
       return response
     } catch (error) {
+      // eslint-disable-next-line no-throw-literal
       throw {
         message: '请求超时',
         status: 504
@@ -65,12 +66,8 @@ export class Networks {
   }
 
   async getData () {
-    try {
-      const response = await this.performRequest()
-      return this.dealType(response)
-    } catch (error) {
-      throw error
-    }
+    const response = await this.performRequest()
+    return this.dealType(response)
   }
 
   dealType (response) {

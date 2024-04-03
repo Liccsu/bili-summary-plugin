@@ -5,7 +5,10 @@ import { Restart } from '../../other/restart.js'
 import common from '../../../lib/common/common.js'
 
 const require = createRequire(import.meta.url)
-const { exec, execSync } = require('child_process')
+const {
+  exec,
+  execSync
+} = require('child_process')
 
 const pluginName = 'bili-summary-plugin'
 
@@ -151,7 +154,7 @@ export class Update extends plugin {
   /**
    *更新日志的方法
    */
-  async updateLog() {
+  async updateLog () {
     let log = await this.getLog()
     await this.reply(log)
   }
@@ -240,9 +243,13 @@ export class Update extends plugin {
    * @returns
    */
   async execSync (cmd) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       exec(cmd, { windowsHide: true }, (error, stdout, stderr) => {
-        resolve({ error, stdout, stderr })
+        resolve({
+          error,
+          stdout,
+          stderr
+        })
       })
     })
   }

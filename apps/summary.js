@@ -3,7 +3,7 @@ import { Networks } from '../model/networks.js'
 import { Wbi } from '../model/wbi.js'
 import { Time } from '../model/time.js'
 
-const regExpResolveTemp = 'b23.tv/[0-9A-Za-z]{7}'
+const regExpResolveTemp = 'b23.tv\\\\?/[0-9A-Za-z]{7}'
 const regExpResolveBV = 'BV[0-9A-Za-z]{10}'
 const regExpResolveAV = 'av[0-9]{1,10}'
 
@@ -43,13 +43,12 @@ export class Summary extends plugin {
     }
 
     const network = new Networks({
-      url: `https://${urlMatched[0]}`,
+      url: `https://${urlMatched[0].replace(/\\/g, '')}`,
       redirect: 'manual'
     })
 
     network.performRequest()
       .then(response => {
-        console.log(response.headers)
         const location = response.headers.get('location')
         if (location) {
           const regExp = `(${regExpResolveAV})|(${regExpResolveBV})`
@@ -88,7 +87,7 @@ export class Summary extends plugin {
       logger.warn('参数异常:', vid)
       return
     }
-    let res = await new Networks({ url: url }).getData()
+    let res = await new Networks({ url }).getData()
     if (res.code !== 0) {
       logger.warn('视频信息解析失败:code ', res.code)
       return
@@ -115,7 +114,7 @@ export class Summary extends plugin {
       up_mid: videoInfo.owner.mid
     }).getQuery()
     url = 'https://api.bilibili.com/x/web-interface/view/conclusion/get?' + query
-    res = await new Networks({ url: url }).getData()
+    res = await new Networks({ url }).getData()
     if (res.code !== 0) {
       /*
        * 0: 成功
@@ -126,6 +125,7 @@ export class Summary extends plugin {
     } else {
       let {
         code,
+        // eslint-disable-next-line camelcase
         model_result
       } = res.data
       if (code !== 0) {
@@ -137,10 +137,13 @@ export class Summary extends plugin {
         logger.warn('不支持AI摘要或无摘要或其他因素导致请求异常:code ', code)
       } else {
         let {
+          // eslint-disable-next-line camelcase
           result_type,
           summary,
           outline
+          // eslint-disable-next-line camelcase
         } = model_result
+        // eslint-disable-next-line camelcase
         if (result_type === 0) {
           /*
            * 0: 没有摘要
@@ -150,14 +153,17 @@ export class Summary extends plugin {
           logger.warn('没有摘要:code ', code)
         } else {
           msg.push(`\n内容概括:${summary}`)
+          // eslint-disable-next-line camelcase
           if (result_type === 2 && outline) {
-            msg.push(`\n==========分段提纲==========`)
+            msg.push('\n==========分段提纲==========')
             outline.forEach(part => {
               let {
                 title,
+                // eslint-disable-next-line camelcase
                 part_outline
               } = part
               msg.push(`\n🏷️${title}`)
+              // eslint-disable-next-line camelcase
               part_outline.forEach(cont => {
                 msg.push(`\n  ${Time.formatDuration(cont.timestamp)} ${cont.content}`)
               })
